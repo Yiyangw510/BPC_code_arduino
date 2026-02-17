@@ -45,7 +45,7 @@ void display(int d, State s){
 
 void loop(){
   int p = readPressure();
-    lcd.setCursor(0,0);
+  lcd.setCursor(0,0);
   lcd.print("Pressure = ");
   lcd.print(d);
   lcd.print(" mmgh");
@@ -53,4 +53,5 @@ void loop(){
   lcd.setCursor(0,1);
   lcd.print("State: ");
   lcd.print(statePrint(s));
+
 }

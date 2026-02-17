@@ -1,4 +1,4 @@
-#include <LiquidCrystal.h>
+#include <LiquidCrystal_I2C.h>
 
 LiquidCrystal_I2C lcd(0x27, 16, 2); //detect mapping address
 
@@ -21,7 +21,7 @@ const char* statePrint(State s){
     case inflate: return "INFLATE";
     case hold: return "HOLD";
     case deflate: return "DEFLATE";
-    case emergency: return "EMERGENCY!!!"
+    case emergency: return "EMERGENCY!!!";
   }
 }
 
@@ -36,7 +36,7 @@ void display(int d, State s){
   lcd.setCursor(0,0);
   lcd.print("Pressure = ");
   lcd.print(d);
-  lcd.print(" mmgh");
+  lcd.print(" mmHg");
 
   lcd.setCursor(0,1);
   lcd.print("State: ");
@@ -47,11 +47,10 @@ void loop(){
   int p = readPressure();
   lcd.setCursor(0,0);
   lcd.print("Pressure = ");
-  lcd.print(d);
+  lcd.print(p);
   lcd.print(" mmgh");
 
   lcd.setCursor(0,1);
   lcd.print("State: ");
   lcd.print(statePrint(s));
-
 }

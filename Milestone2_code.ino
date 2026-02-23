@@ -39,15 +39,15 @@ void emergencyState(){
 }
 
 bool stopBottom(){
-  return (digitalRead(stop_pin) == LOW);
+  return (digitalRead(stop_pin) == HIGH);
 }
 
 void setup() {
   // put your setup code here, to run once:
-  pinMode(button_pin, INPUT_PULLUP);
+  pinMode(button_pin, INPUT);
   pinMode(pump_pin, OUTPUT);
   pinMode(valve_pin, OUTPUT);
-  pinMode(stop_pin, INPUT_PULLUP);
+  pinMode(stop_pin, INPUT);
 
   Serial.begin(9600);
 
@@ -69,7 +69,7 @@ void loop() {
     digitalWrite(pump_pin, LOW);
     digitalWrite(valve_pin, LOW);
 
-    if(digitalRead(button_pin) == LOW){
+    if(digitalRead(button_pin) == HIGH){
       state = inflate;
     } 
   }
@@ -104,7 +104,7 @@ void loop() {
     digitalWrite(pump_pin, LOW);
     digitalWrite(valve_pin, HIGH);
 
-    if(!stopBottom() && digitalRead(button_pin) == LOW){
+    if(!stopBottom() && digitalRead(button_pin) == HIGH){
     state = idle;
     }
   }

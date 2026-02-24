@@ -24,14 +24,13 @@
 
 
 
- int readPressure(){// convert pressure to mmHg
-  int adc = analogRead(A0);
-
-  float v = adc * (5.0 / 1023.0);
-  float p = 50.0 * v * v;
-  return (int)p;// temporary
-
+float readPressure() {
+  int adc = analogRead(SENSOR_PIN);
+  constexpr float k = 100.0 / (MMHG100ADC - MMHG0ADC);
+  constexpr float h = MMHG0ADC * k;
+  return adc * k - h;
 }
+
 void emergencyState(){
   state = emergency;
   digitalWrite(pump_pin,LOW);

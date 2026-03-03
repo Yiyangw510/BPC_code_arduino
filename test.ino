@@ -29,7 +29,7 @@ const int stop_pin = 4;
 unsigned long time_state = 0;  //test time
 
 const int pressure_t = 150;          //Assume pressure threshold
-const int pressure_r = 10;           //Assume pressure release threshold
+const int pressure_r = 1;           //Assume pressure release threshold
 const unsigned long hold_ms = 4000;  //Assume pressure hold time
 
 
@@ -85,9 +85,15 @@ void LOOP_TEST() {
       }
     case (inflate):
       if (p > 150) {
+        digitalWrite(pump_pin, LOW);
+        digitalWrite(valve_pin, HIGH);
+        digitalWrite(LED_BUILTIN, LOW);
+        delay(4000);
+
         digitalWrite(LED_BUILTIN, LOW);
         digitalWrite(pump_pin, LOW);
         digitalWrite(valve_pin, LOW);
+        delay(10000);
         state = idle;
       }
   }

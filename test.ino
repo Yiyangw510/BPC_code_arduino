@@ -40,8 +40,8 @@ void setup() {
 }
 
 #define MAX_PULSE_RECORD 50
-#define INFLATE_MAX_MMHG 139.0
-#define DEFLATE_TIME 23000
+#define INFLATE_MAX_MMHG 150.0
+#define DEFLATE_TIME 30000
 
 // for filtering noise
 #define PULSE_MAX_NOISE 20
@@ -133,10 +133,10 @@ void loop() {
     MAP = pressure[MAP_index];
     Serial.print("MAP: pulse #");
     Serial.println(MAP_index);
-    int target = 0.5 * max_pulse;  //SBP
+    float target = 0.5 * max_pulse;  //SBP
     for (int j = IGNORE_N_PULSE; j < MAP_index; j++) {  // find SBP
-      int pulse0 = pulse[j];
-      int pulse1 = pulse[j + 1];
+      float pulse0 = pulse[j];
+      float pulse1 = pulse[j + 1];
       if (pulse0 <= target && target <= pulse1) {
         float pressure0 = pressure[j];
         float pressure1 = pressure[j + 1];
@@ -146,8 +146,8 @@ void loop() {
     }
     target = 0.8 * max_pulse;  //DBP
     for (int j = MAP_index; j < i; j++) {  // find DBP
-      int pulse0 = pulse[j];
-      int pulse1 = pulse[j + 1];
+      float pulse0 = pulse[j];
+      float pulse1 = pulse[j + 1];
       if (pulse0 >= target && target >= pulse1) {
         float pressure0 = pressure[j];
         float pressure1 = pressure[j + 1];

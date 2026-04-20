@@ -8,12 +8,12 @@
 #define VALVE_PIN 7
 #define STOP_PIN 4
 
-#define MMHG100ADC 512
-#define MMHG0ADC 204
+#define MMHG200ADC (1024.0 * 0.8)
+#define MMHG0ADC (1024.0 * 0.2)
 
 float readPressure() {
   float adc = analogRead(SENSOR_PIN);
-  return (adc - MMHG0ADC) * (100.0 / (MMHG100ADC - MMHG0ADC));
+  return (adc - MMHG0ADC) * (200.0 / (MMHG200ADC - MMHG0ADC));
 }
 
 // read pulse amplitude, centered by zero
@@ -44,7 +44,7 @@ void setup() {
 #define DEFLATE_TIME 23000
 
 // for filtering noise
-#define PULSE_MAX_NOISE 5
+#define PULSE_MAX_NOISE 20
 // ignore first N pulse cycles
 #define IGNORE_N_PULSE 1
 
@@ -119,49 +119,49 @@ void loop() {
       i++;
     }
   }
-  float MAP = 0, DBP = 0, SBP = 0;
+  float MAP = 0, DBP = pressure[i-1], SBP = pressure[IGNORE_N_PULSE];
   Serial.println("====result=====");
   {
-    int max_pulse_diff = 0;
+    int max_pulse = 0;
     int MAP_index = 0;
     for (int j = IGNORE_N_PULSE; j < i; j++) {  // find MAP
-      if (pulse[j] > max_pulse_diff) {          // when pulse is max
-        max_pulse_diff = pulse[j];
+      if (pulse[j] > max_pulse) {               // when pulse is max
+        max_pulse = pulse[j];
         MAP_index = j;
       }
     }
     MAP = pressure[MAP_index];
     Serial.print("MAP: pulse #");
     Serial.println(MAP_index);
-    int target = 0.5 * max_pulse_diff;  //SBP
-    int min_diff = 1024;
+    int target = 0.5 * max_pulse;  //SBP
     for (int j = IGNORE_N_PULSE; j < MAP_index; j++) {  // find SBP
-      int a = pulse[j];
-      int SBP_pulse_diff = abs(a - target);
-      if (SBP_pulse_diff < min_diff) {
-        min_diff = SBP_pulse_diff;
-        SBP = pressure[j];
-        // SBP = pressure[j] + (pressure[j + 1] - pressure[j]) * (target - pulse[j]) / (pulse[j + 1] - pulse[j]);
+      int pulse0 = pulse[j];
+      int pulse1 = pulse[j + 1];
+      if (pulse0 <= target && target <= pulse1) {
+        float pressure0 = pressure[j];
+        float pressure1 = pressure[j + 1];
+        SBP = pressure0 + ((pressure1 - pressure0) * ((target - pulse0)/(pulse1 - pulse0)));
+        break;
       }
     }
-    target = 0.8 * max_pulse_diff;  //DBP
-    min_diff = 1024;
+    target = 0.8 * max_pulse;  //DBP
     for (int j = MAP_index; j < i; j++) {  // find DBP
-      int a = pulse[j];
-      int DBP_pulse_diff = abs(a - target);
-      if (DBP_pulse_diff < min_diff) {
-        min_diff = DBP_pulse_diff;
-        DBP = pressure[j];
-        // DBP = pressure[j] + (pressure[j + 1] - pressure[j]) * (target - pulse[j]) / (pulse[j + 1] - pulse[j]);
+      int pulse0 = pulse[j];
+      int pulse1 = pulse[j + 1];
+      if (pulse0 >= target && target >= pulse1) {
+        float pressure0 = pressure[j];
+        float pressure1 = pressure[j + 1];
+        DBP = pressure0 + ((pressure1 - pressure0) * ((target - pulse0)/(pulse1 - pulse0)));
+        break;
       }
     }
   }
-  Serial.print("MBP: ");
+  Serial.print("MAP: ");
   Serial.println(MAP);
   Serial.print("DBP: ");
   Serial.println(DBP);
   Serial.print("SBP: ");
   Serial.println(SBP);
-  while (true)
-    ;
+  // while (true)
+  //   ;
 }
